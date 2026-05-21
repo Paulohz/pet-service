@@ -22,18 +22,20 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Table(name= "pets")
-@Getter @Setter @NoArgsConstructor
+@Table(name = "pets")
+@Getter
+@Setter
+@NoArgsConstructor
 public class PetEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "id_pet")
     private UUID id;
 
-    @Column(name= "nm_pet", nullable = false)
+    @Column(name = "nm_pet", nullable = false)
     private String name;
 
-    @Column(name= "nm_breed")
+    @Column(name = "nm_breed")
     private String breed;
 
     @Column(name = "dt_birth_date")
@@ -68,7 +70,8 @@ public class PetEntity {
     protected void onCreate() {
         this.createdAt = LocalDateTime.now();
         this.updatedAt = LocalDateTime.now();
-        if (this.status == null) this.status = PetStatus.AVAILABLE;
+        if (this.status == null)
+            this.status = PetStatus.AVAILABLE;
     }
 
     @PreUpdate
@@ -78,7 +81,6 @@ public class PetEntity {
 
     public static PetEntity fromDomain(Pet pet) {
         PetEntity e = new PetEntity();
-        e.setId(pet.getId());
         e.setId(pet.getId());
         e.setName(pet.getName());
         e.setBreed(pet.getBreed());
@@ -111,5 +113,4 @@ public class PetEntity {
         return p;
     }
 
-    
 }

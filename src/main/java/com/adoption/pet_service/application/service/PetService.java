@@ -23,7 +23,6 @@ public class PetService {
 
     public PetResponse create(CreatePetRequest req) {
         var entity = new PetEntity();
-        entity.setId(UUID.randomUUID());
         entity.setName(req.name());
         entity.setBreed(req.breed());
         entity.setBirthDate(req.birthDate());
@@ -35,37 +34,27 @@ public class PetService {
         return PetResponse.from(petRepository.save(entity).toDomain());
     }
 
-    public List<PetResponse> findAll() {
-        return petRepository.findByDhDeletedAtIsNull()
-            .stream().map(e -> PetResponse.from(e.toDomain())).toList();
-    }
-
     public PetResponse findById(UUID id) {
-        return petRepository.findByIdPetAndDhDeletedAtIsNull(id)
-            .map(e -> PetResponse.from(e.toDomain()))
-            .orElseThrow(() -> new PetNotFoundException(id));
+        return petRepository.findByIdAndDeletedAtIsNull(id)
+                .map(e -> PetResponse.from(e.toDomain()))
+                .orElseThrow(() -> new PetNotFoundException(id));
     }
 
-    public List<PetResponse> findByStatus(PetStatus status) {
-        return petRepository.findByStPetAndDhDeletedAtIsNull(status)
-            .stream().map(e -> PetResponse.from(e.toDomain())).toList();
-    }
-
-    public List<PetResponse> findByCity(String city) {
-        return petRepository.findByNmCityIgnoreCaseAndDhDeletedAtIsNull(city)
-            .stream().map(e -> PetResponse.from(e.toDomain())).toList();
+    public List<PetResponse> findWithFilters(PetStatus status, String city) {
+        return petRepository.findWithFilters(status, city)
+                .stream().map(e -> PetResponse.from(e.toDomain())).toList();
     }
 
     public PetResponse updateStatus(UUID id, PetStatus status) {
-        var entity = petRepository.findByIdPetAndDhDeletedAtIsNull(id)
-            .orElseThrow(() -> new PetNotFoundException(id));
+        var entity = petRepository.findByIdAndDeletedAtIsNull(id)
+                .orElseThrow(() -> new PetNotFoundException(id));
         entity.setStatus(status);
         return PetResponse.from(petRepository.save(entity).toDomain());
     }
 
     public PetResponse updateLocation(UUID id, UpdateLocationRequest req) {
-        var entity = petRepository.findByIdPetAndDhDeletedAtIsNull(id)
-            .orElseThrow(() -> new PetNotFoundException(id));
+        var entity = petRepository.findByIdAndDeletedAtIsNull(id)
+                .orElseThrow(() -> new PetNotFoundException(id));
         entity.setLatitude(req.latitude());
         entity.setLongitude(req.longitude());
         entity.setCity(req.city());
@@ -74,8 +63,8 @@ public class PetService {
     }
 
     public void delete(UUID id) {
-        var entity = petRepository.findByIdPetAndDhDeletedAtIsNull(id)
-            .orElseThrow(() -> new PetNotFoundException(id));
+        var entity = petRepository.findByIdAndDeletedAtIsNull(id)
+                .orElseThrow(() -> new PetNotFoundException(id));
         entity.setDeletedAt(LocalDateTime.now());
         petRepository.save(entity);
     }
