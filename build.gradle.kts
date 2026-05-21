@@ -31,7 +31,9 @@ dependencies {
 	testCompileOnly("org.projectlombok:lombok")
 	testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 	testAnnotationProcessor("org.projectlombok:lombok")
-	developmentOnly('org.springframework.boot:spring-boot-docker-compose')
+	developmentOnly("org.springframework.boot:spring-boot-docker-compose")
+	developmentOnly("org.springframework.boot:spring-boot-devtools")
+	testImplementation("com.h2database:h2")
 }
 
 tasks.withType<Test> {
