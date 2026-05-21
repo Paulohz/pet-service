@@ -1,7 +1,7 @@
 package com.adoption.pet_service.domain.model;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.UUID;
 
 import lombok.Data;
@@ -17,9 +17,9 @@ public class Pet {
     private Double longitude;
     private String city;
     private String state;
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
-    private LocalDateTime deletedAt;
+    private Instant createdAt;
+    private Instant updatedAt;
+    private Instant deletedAt;
 
     public boolean isActive() {
         return this.deletedAt == null;

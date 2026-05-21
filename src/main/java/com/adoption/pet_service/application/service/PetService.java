@@ -1,6 +1,6 @@
 package com.adoption.pet_service.application.service;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
@@ -65,7 +65,7 @@ public class PetService {
     public void delete(UUID id) {
         var entity = petRepository.findByIdAndDeletedAtIsNull(id)
                 .orElseThrow(() -> new PetNotFoundException(id));
-        entity.setDeletedAt(LocalDateTime.now());
+        entity.setDeletedAt(Instant.now());
         petRepository.save(entity);
     }
 }

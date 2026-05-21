@@ -1,7 +1,7 @@
 package com.adoption.pet_service.infrastructure.persistence;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.UUID;
 
 import com.adoption.pet_service.domain.model.Pet;
@@ -58,25 +58,25 @@ public class PetEntity {
     private String state;
 
     @Column(name = "dh_created_at", nullable = false, updatable = false)
-    private LocalDateTime createdAt;
+    private Instant createdAt;
 
     @Column(name = "dh_updated_at")
-    private LocalDateTime updatedAt;
+    private Instant updatedAt;
 
     @Column(name = "dh_deleted_at")
-    private LocalDateTime deletedAt;
+    private Instant deletedAt;
 
     @PrePersist
     protected void onCreate() {
-        this.createdAt = LocalDateTime.now();
-        this.updatedAt = LocalDateTime.now();
+        this.createdAt = Instant.now();
+        this.updatedAt = Instant.now();
         if (this.status == null)
             this.status = PetStatus.AVAILABLE;
     }
 
     @PreUpdate
     protected void onUpdate() {
-        this.updatedAt = LocalDateTime.now();
+        this.updatedAt = Instant.now();
     }
 
     public static PetEntity fromDomain(Pet pet) {
