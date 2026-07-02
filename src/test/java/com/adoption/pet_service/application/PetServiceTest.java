@@ -19,6 +19,7 @@ import com.adoption.pet_service.application.dto.PetResponse;
 import com.adoption.pet_service.application.dto.UpdateLocationRequest;
 import com.adoption.pet_service.application.service.PetService;
 import com.adoption.pet_service.domain.exception.PetNotFoundException;
+import com.adoption.pet_service.domain.model.PetSpecies;
 import com.adoption.pet_service.domain.model.PetStatus;
 import com.adoption.pet_service.infrastructure.persistence.PetEntity;
 import com.adoption.pet_service.infrastructure.persistence.PetRepository;
@@ -27,11 +28,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 @ExtendWith(MockitoExtension.class)
 public class PetServiceTest {
 
-    private PetEntity buildEntity(UUID id, PetStatus status) {
+    private PetEntity buildEntity(UUID id, PetStatus status, UUID customerId, PetSpecies species) {
+
         PetEntity entity = new PetEntity();
         entity.setId(id);
         entity.setName("Rex");
-        entity.setBreed("Labrador");
+        entity.setSpecies(species);
         entity.setBirthDate(LocalDate.of(2020, 1, 1));
         entity.setStatus(status);
         entity.setLatitude(-23.5);
@@ -40,6 +42,7 @@ public class PetServiceTest {
         entity.setState("SP");
         entity.setCreatedAt(Instant.now());
         entity.setUpdatedAt(Instant.now());
+        entity.setCustomerId(customerId);
         return entity;
     }
 
@@ -52,7 +55,10 @@ public class PetServiceTest {
     @Test
     void findById_shouldReturnPet_whenFound() {
         UUID id = UUID.randomUUID();
-        PetEntity entity = buildEntity(id, PetStatus.AVAILABLE);
+        PetSpecies species = PetSpecies.DOG;
+        UUID customerId = UUID.randomUUID();
+
+        PetEntity entity = buildEntity(id, PetStatus.AVAILABLE, customerId, species);
         when(petRepository.findByIdAndDeletedAtIsNull(id)).thenReturn(Optional.of(entity));
 
         PetResponse response = petService.findById(id);
@@ -71,20 +77,21 @@ public class PetServiceTest {
 
     @Test
     void findByFilters_shouldReturnPets_whenFound() {
-        PetEntity entity1 = buildEntity(UUID.randomUUID(), PetStatus.AVAILABLE);
-        PetEntity entity2 = buildEntity(UUID.randomUUID(), PetStatus.AVAILABLE);
-        when(petRepository.findWithFilters(PetStatus.AVAILABLE, "São Paulo")).thenReturn(List.of(entity1, entity2));
+        PetEntity entity1 = buildEntity(UUID.randomUUID(), PetStatus.AVAILABLE, UUID.randomUUID(), PetSpecies.DOG);
+        PetEntity entity2 = buildEntity(UUID.randomUUID(), PetStatus.AVAILABLE, UUID.randomUUID(), PetSpecies.DOG);
+        when(petRepository.findWithFilters(PetStatus.AVAILABLE, PetSpecies.DOG, "São Paulo"))
+                .thenReturn(List.of(entity1, entity2));
 
-        var responses = petService.findWithFilters(PetStatus.AVAILABLE, "São Paulo");
+        var responses = petService.findWithFilters(PetStatus.AVAILABLE, PetSpecies.DOG, "São Paulo");
 
         assertThat(responses).hasSize(2);
     }
 
     @Test
     void findByFilters_shouldReturnEmptyList_whenNotFound() {
-        when(petRepository.findWithFilters(PetStatus.AVAILABLE, "São Paulo")).thenReturn(List.of());
+        when(petRepository.findWithFilters(PetStatus.AVAILABLE, PetSpecies.DOG, "São Paulo")).thenReturn(List.of());
 
-        var responses = petService.findWithFilters(PetStatus.AVAILABLE, "São Paulo");
+        var responses = petService.findWithFilters(PetStatus.AVAILABLE, PetSpecies.DOG, "São Paulo");
 
         assertThat(responses).isEmpty();
     }
@@ -100,8 +107,10 @@ public class PetServiceTest {
     @Test
     void updateStatus_shouldReturnUpdatedPet_whenFound() {
         UUID id = UUID.randomUUID();
+        PetSpecies species = PetSpecies.DOG;
+        UUID customerId = UUID.randomUUID();
 
-        PetEntity entity = buildEntity(id, PetStatus.AVAILABLE);
+        PetEntity entity = buildEntity(id, PetStatus.AVAILABLE, customerId, species);
         when(petRepository.findByIdAndDeletedAtIsNull(id)).thenReturn(Optional.of(entity));
         when(petRepository.save(entity)).thenReturn(entity);
 
@@ -122,7 +131,7 @@ public class PetServiceTest {
     @Test
     void updateLocation_shouldReturnUpdatedPet_whenFound() {
         UUID id = UUID.randomUUID();
-        PetEntity entity = buildEntity(id, PetStatus.AVAILABLE);
+        PetEntity entity = buildEntity(id, PetStatus.AVAILABLE, UUID.randomUUID(), PetSpecies.DOG);
         when(petRepository.findByIdAndDeletedAtIsNull(id)).thenReturn(Optional.of(entity));
         when(petRepository.save(entity)).thenReturn(entity);
 
@@ -145,7 +154,7 @@ public class PetServiceTest {
     @Test
     void delete_shouldSetDeletedAt_whenFound() {
         UUID id = UUID.randomUUID();
-        PetEntity entity = buildEntity(id, PetStatus.AVAILABLE);
+        PetEntity entity = buildEntity(id, PetStatus.AVAILABLE, UUID.randomUUID(), PetSpecies.DOG);
 
         when(petRepository.findByIdAndDeletedAtIsNull(id)).thenReturn(Optional.of(entity));
         when(petRepository.save(entity)).thenReturn(entity);

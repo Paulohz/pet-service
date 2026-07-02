@@ -5,6 +5,7 @@ import java.time.Instant;
 import java.util.UUID;
 
 import com.adoption.pet_service.domain.model.Pet;
+import com.adoption.pet_service.domain.model.PetSpecies;
 import com.adoption.pet_service.domain.model.PetStatus;
 
 import jakarta.persistence.Column;
@@ -35,8 +36,12 @@ public class PetEntity {
     @Column(name = "nm_pet", nullable = false)
     private String name;
 
-    @Column(name = "nm_breed")
-    private String breed;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "tp_species", nullable = false)
+    private PetSpecies species;
+
+    @Column(name = "id_customer", nullable = false)
+    private UUID customerId;
 
     @Column(name = "dt_birth_date")
     private LocalDate birthDate;
@@ -83,13 +88,14 @@ public class PetEntity {
         PetEntity e = new PetEntity();
         e.setId(pet.getId());
         e.setName(pet.getName());
-        e.setBreed(pet.getBreed());
+        e.setSpecies(pet.getSpecies());
         e.setBirthDate(pet.getBirthDate());
         e.setStatus(pet.getStatus());
         e.setLatitude(pet.getLatitude());
         e.setLongitude(pet.getLongitude());
         e.setCity(pet.getCity());
         e.setState(pet.getState());
+        e.setCustomerId(pet.getCustomerId());
         e.setCreatedAt(pet.getCreatedAt());
         e.setUpdatedAt(pet.getUpdatedAt());
         e.setDeletedAt(pet.getDeletedAt());
@@ -100,13 +106,14 @@ public class PetEntity {
         Pet p = new Pet();
         p.setId(this.id);
         p.setName(this.name);
-        p.setBreed(this.breed);
+        p.setSpecies(this.species);
         p.setBirthDate(this.birthDate);
         p.setStatus(this.status);
         p.setLatitude(this.latitude);
         p.setLongitude(this.longitude);
         p.setCity(this.city);
         p.setState(this.state);
+        p.setCustomerId(this.customerId);
         p.setCreatedAt(this.createdAt);
         p.setUpdatedAt(this.updatedAt);
         p.setDeletedAt(this.deletedAt);

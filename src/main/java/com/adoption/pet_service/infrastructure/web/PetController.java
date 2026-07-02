@@ -8,6 +8,7 @@ import com.adoption.pet_service.application.dto.CreatePetRequest;
 import com.adoption.pet_service.application.dto.PetResponse;
 import com.adoption.pet_service.application.dto.UpdateLocationRequest;
 import com.adoption.pet_service.application.service.PetService;
+import com.adoption.pet_service.domain.model.PetSpecies;
 import com.adoption.pet_service.domain.model.PetStatus;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -46,17 +47,19 @@ public class PetController {
 
     @GetMapping
     @Operation(summary = "Listar pets", description = "Lista todos os pets ativos, com filtro opcional por status ou cidade")
-    @ApiResponse(responseCode = "200", description = "Lista retornada com sucesso")
-    public List<PetResponse> findAll(@RequestParam(name = "status", required = false) PetStatus status,
+    public List<PetResponse> findAll(
+            @RequestParam(name = "status", required = false) PetStatus status,
+            @RequestParam(name = "species", required = false) PetSpecies species,
             @RequestParam(name = "city", required = false) String city) {
-        return petService.findWithFilters(status, city);
+        return petService.findWithFilters(status, species, city);
     }
 
     @GetMapping("/{id}")
     @Operation(summary = "Buscar pet por ID")
     @ApiResponse(responseCode = "200", description = "Pet encontrado")
     @ApiResponse(responseCode = "404", description = "Pet não encontrado")
-    public PetResponse findById(@Parameter(description = "ID do pet", required = true) @PathVariable UUID id) {
+    public PetResponse findById(
+            @Parameter(description = "ID do pet", required = true, example = "3fa85f64-5717-4562-b3fc-2c963f66afa6") @PathVariable(name = "id") UUID id) {
         return petService.findById(id);
     }
 
@@ -64,7 +67,8 @@ public class PetController {
     @Operation(summary = "Atualizar status", description = "Atualiza o status do pet para AVAILABLE ou ADOPTED")
     @ApiResponse(responseCode = "200", description = "Status atualizado com sucesso")
     @ApiResponse(responseCode = "404", description = "Pet não encontrado")
-    public PetResponse updateStatus(@Parameter(description = "ID do pet", required = true) @PathVariable UUID id,
+    public PetResponse updateStatus(
+            @Parameter(description = "ID do pet", required = true, example = "3fa85f64-5717-4562-b3fc-2c963f66afa6") @PathVariable(name = "id") UUID id,
             @RequestParam(name = "status") PetStatus status) {
         return petService.updateStatus(id, status);
     }
@@ -73,7 +77,8 @@ public class PetController {
     @Operation(summary = "Atualizar localização", description = "Atualiza a localização atual do pet")
     @ApiResponse(responseCode = "200", description = "Localização atualizada com sucesso")
     @ApiResponse(responseCode = "404", description = "Pet não encontrado")
-    public PetResponse updateLocation(@Parameter(description = "ID do pet", required = true) @PathVariable UUID id,
+    public PetResponse updateLocation(
+            @Parameter(description = "ID do pet", required = true, example = "3fa85f64-5717-4562-b3fc-2c963f66afa6") @PathVariable(name = "id") UUID id,
             @Valid @RequestBody UpdateLocationRequest req) {
         return petService.updateLocation(id, req);
     }
@@ -83,7 +88,17 @@ public class PetController {
     @Operation(summary = "Remover pet", description = "Remove o pet via soft delete")
     @ApiResponse(responseCode = "204", description = "Pet removido com sucesso")
     @ApiResponse(responseCode = "404", description = "Pet não encontrado")
-    public void delete(@Parameter(description = "ID do pet", required = true) @PathVariable UUID id) {
+    public void delete(
+            @Parameter(description = "ID do pet", required = true, example = "3fa85f64-5717-4562-b3fc-2c963f66afa6") @PathVariable(name = "id") UUID id) {
         petService.delete(id);
+    }
+
+    @GetMapping("/customer/{customerId}")
+    @Operation(summary = "Listar pets de um customer")
+    @ApiResponse(responseCode = "200", description = "Pets encontrados")
+    @ApiResponse(responseCode = "404", description = "Customer não encontrado")
+    public List<PetResponse> findByCustomer(
+            @Parameter(description = "ID do customer", required = true, example = "3fa85f64-5717-4562-b3fc-2c963f66afa6") @PathVariable(name = "customerId") UUID customerId) {
+        return petService.findByCustomer(customerId);
     }
 }

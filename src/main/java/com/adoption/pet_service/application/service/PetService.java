@@ -10,6 +10,7 @@ import com.adoption.pet_service.application.dto.CreatePetRequest;
 import com.adoption.pet_service.application.dto.PetResponse;
 import com.adoption.pet_service.application.dto.UpdateLocationRequest;
 import com.adoption.pet_service.domain.exception.PetNotFoundException;
+import com.adoption.pet_service.domain.model.PetSpecies;
 import com.adoption.pet_service.domain.model.PetStatus;
 import com.adoption.pet_service.infrastructure.persistence.PetEntity;
 import com.adoption.pet_service.infrastructure.persistence.PetRepository;
@@ -24,13 +25,14 @@ public class PetService {
     public PetResponse create(CreatePetRequest req) {
         var entity = new PetEntity();
         entity.setName(req.name());
-        entity.setBreed(req.breed());
+        entity.setSpecies(req.species());
         entity.setBirthDate(req.birthDate());
         entity.setStatus(PetStatus.AVAILABLE);
         entity.setLatitude(req.latitude());
         entity.setLongitude(req.longitude());
         entity.setCity(req.city());
         entity.setState(req.state());
+        entity.setCustomerId(req.customerId());
         return PetResponse.from(petRepository.save(entity).toDomain());
     }
 
@@ -40,8 +42,13 @@ public class PetService {
                 .orElseThrow(() -> new PetNotFoundException(id));
     }
 
-    public List<PetResponse> findWithFilters(PetStatus status, String city) {
-        return petRepository.findWithFilters(status, city)
+    public List<PetResponse> findByCustomer(UUID customerId) {
+        return petRepository.findByCustomerIdAndDeletedAtIsNull(customerId)
+                .stream().map(e -> PetResponse.from(e.toDomain())).toList();
+    }
+
+    public List<PetResponse> findWithFilters(PetStatus status, PetSpecies species, String city) {
+        return petRepository.findWithFilters(status, species, city)
                 .stream().map(e -> PetResponse.from(e.toDomain())).toList();
     }
 

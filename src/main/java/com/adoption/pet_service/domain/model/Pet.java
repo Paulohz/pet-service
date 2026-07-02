@@ -10,13 +10,14 @@ import lombok.Data;
 public class Pet {
     private UUID id;
     private String name;
-    private String breed;
+    private PetSpecies species;
     private LocalDate birthDate;
     private PetStatus status;
     private Double latitude;
     private Double longitude;
     private String city;
     private String state;
+    private UUID customerId;
     private Instant createdAt;
     private Instant updatedAt;
     private Instant deletedAt;
